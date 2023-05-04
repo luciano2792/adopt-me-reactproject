@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Link, BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AdoptedPetContext from './AdoptedPetContext';
-import SearchParams from './SearchParams';
-import Details from './Details';
+
+const Details = lazy(() => import("./Details"));
+const SearchParams = lazy(() => import("./SearchParams"));
 
 const queryClient = new QueryClient ({
   defaultOptions: {
@@ -18,21 +19,26 @@ const queryClient = new QueryClient ({
 const App = () => {
   const adoptedPet = useState(null);
   return(
-    <div className="p-0 m-0" style={{ background: "url(https://pets-images.dev-apis.com/pets/wallpaperA.jpg)" }}>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AdoptedPetContext.Provider value={adoptedPet}>
         <QueryClientProvider client={queryClient}>
-          <AdoptedPetContext.Provider value={adoptedPet}>
-            <header className="w-full mb-10 text-center bg-gradient-to-b from-yellow-400 to-red-500 p-7">
-              <Link className="text-6xl text-white hover:text-gray-200 " to="/">Adopt Me!</Link>
+          <Suspense 
+          fallback={
+          <div className="loading-pane">
+            <h2 className='loader'>🐶</h2>
+          </div>}>
+            <header>
+              <Link to="/">Adopt Me!</Link>
             </header>
             <Routes>
               <Route path='/details/:id' element={<Details/>} />
               <Route path='/' element={<SearchParams/>} />
             </Routes>
-          </AdoptedPetContext.Provider>
+          </Suspense>
         </QueryClientProvider>
-      </BrowserRouter>
-    </div>
+      </AdoptedPetContext.Provider>
+    </BrowserRouter>
+    
   );
 };
 

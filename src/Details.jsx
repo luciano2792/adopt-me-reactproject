@@ -1,11 +1,13 @@
-import { useState, useContext } from "react";
+import { lazy, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import AdoptedPetContext from "./AdoptedPetContext";
 import ErrorBoundary from "./ErrorBoundary";
 import Carousel from "./Carousel";
 import fetchPet from "./fetchPet";
-import Modal from "./Modal";
+
+const Modal = lazy(() => import('./Modal'));
+
 
 const Details = () => {
     const [showModal, setShowModal] = useState(false);
@@ -25,15 +27,14 @@ const Details = () => {
     const pet = results.data.pets[0];
 
     return (
-        <div className="">
+        <div className="details">
             <Carousel images={pet.images} />
-            <div className="mt-10 mx-auto mb-0 bg-orange-200">
-                <h1 className="text-2xl text-center">{pet.name}</h1>
-                <h2 className="text-lg flex flex-col justify-center items-center">
-                    <p className="font-bold">{pet.animal}</p> 
-                    {pet.breed} - {pet.city}, {pet.state}
-                    <button className="rounded px-6 py-2 color text-white hover:opacity-50 border-none bg-orange-500 block justify-center" onClick={() => setShowModal(true)}>Adopt {pet.name}</button>
-                    <p className="w-11/12">{pet.description}</p>
+            <div>
+                <h1>{pet.name}</h1>
+                <h2>
+                    {pet.animal} - {pet.breed} - {pet.city}, {pet.state}
+                    <button onClick={() => setShowModal(true)}>Adopt {pet.name}</button>
+                    <p>{pet.description}</p>
                     {showModal ?
                         (
                             <Modal>
